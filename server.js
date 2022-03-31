@@ -8,6 +8,9 @@ const parser = require('body-parser');
 app.use(parser.json());
 app.use(parser.urlencoded({extended: true}))
 
+//creating gallery images static folder middleware with express
+app.use('/images',express.static('images'));
+
 
 //transporter - makes the connction for us
 let transporter = nodemailer.createTransport({
@@ -82,5 +85,5 @@ app.post('/send', (req, res)=> {
     })
 
 app.listen(port, () => {
-    console.log(`Server running `);
+    console.log(`Woodstove Leather Goods server running on port:${port}!`);
       });
