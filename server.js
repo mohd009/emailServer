@@ -1,7 +1,26 @@
 const nodemailer = require('nodemailer')
 const express = require('express');
 const app = express();
-const port=  8887;
+const port= 3000;
+var hostname = ""
+
+
+/*
+var path = require('path');   
+
+
+app.use(express.static(path.join(__dirname, 'dist/woodstove')));
+
+//Any routes will be redirected to the angular app
+app.get('*', function(req, res) {
+    res.sendFile(path.join(__dirname, 'dist/woodstove/index.html'));
+});
+*/
+//-----------------------------------------------------------------------
+
+
+
+
 
 //for post
 const parser = require('body-parser');
@@ -10,6 +29,8 @@ app.use(parser.urlencoded({extended: true}))
 
 //creating gallery images static folder middleware with express
 app.use('/images',express.static('images'));
+
+
 
 
 //transporter - makes the connction for us
@@ -85,5 +106,7 @@ app.post('/send', (req, res)=> {
     })
 
 app.listen(port, () => {
-    console.log(`Woodstove Leather Goods server running on port:${port}!`);
+    
+    console.log(`Woodstove Leather Goods server running on port:${port} `);
+    
       });
