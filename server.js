@@ -1,34 +1,95 @@
 const nodemailer = require('nodemailer')
 const express = require('express');
 const app = express();
-const port= 3000;
-var hostname = ""
+const port=  process.env.PORT || 3000;
 
-
-/*
 var path = require('path');   
 
 
+app.use('/images',express.static('images/galleryimages'));
+
+  
+
+//frontend calls to server when it starts automatically 
+//---------------------------------------------------------------------
 app.use(express.static(path.join(__dirname, 'dist/woodstove')));
 
 //Any routes will be redirected to the angular app
 app.get('*', function(req, res) {
-    res.sendFile(path.join(__dirname, 'dist/woodstove/index.html'));
+   res.sendFile(path.join(__dirname, 'dist/woodstove/index.html'));
 });
-*/
 //-----------------------------------------------------------------------
 
 
+//for our mongoDB 
+const mongoose = require('mongoose') //mongo object
+const mongo_uri = "mongodb+srv://woodstove_user:ToOS7w4VWp3cJMuh@woodstove.uyr0p.mongodb.net/woodstove-customers?retryWrites=true&w=majority"
+mongoose.connect(mongo_uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+mongoose.connection.on('connected', () => {
+    console.log('monggose connexted');
+})
+//make a schema
+const Schema = mongoose.Schema;
+const MyData = new Schema({
+    firstName : String,
+    lastName :String,
+    email : String,
+    phone: Number,
+    details: String
+    //price: int --for later
+});
 
+// define how we want model to be 
+//our collection db online is customerinfos -- but mongo will auto pluralize the customerInfo in the code
+const makeCustomerModel = mongoose.model('customerInfo', MyData) //collection in our db called 'customerInfo'
 
+//add data and save //just a test sample but should put this in the request
+const data = {
+    "firstName": "Moh2121",
+    "lastName": "mo",
+    "email": "mohdbd99@gmail.com",
+    "phone": 2222,
+    "details": "okkk"
+}
 
+function saveToDB(custData){
+     //now we save to mongoDB
+     const newData = new makeCustomerModel(custData)
+     newData.save((error)=> {
+     if (error){
+        console.log("issue")
+     }else{
+        console.log("added to dattabse")
+    }
+ })
+}
+//const newData = new makeCustomerModel(data)
+//newData.save((error)=> {
+  //  if (error){
+  //      console.log("issue")
+  //  }else{
+ //       console.log("added to dattabse")
+ //   }
+//})
+
+//---------------------------------------------------------------------
+//my requests
+//----------------------------------------------------------------------
 //for post
 const parser = require('body-parser');
 app.use(parser.json());
 app.use(parser.urlencoded({extended: true}))
 
 //creating gallery images static folder middleware with express
-app.use('/images',express.static('images'));
+
+//-----------------------------    images
+
+
+
+
 
 
 
@@ -53,7 +114,7 @@ let mailOptions = {
 }
 
 
-//updated by peter - i can push
+
 
 //step 3
 function sendmail(){
@@ -76,10 +137,22 @@ app.use((req, res, next) => {
     next(); })
 
 
+//----------------------------
+    // ALL MY REQUESTS
+
+//-----------------------------    
+app.get('/', (req, res)=> {
+    res.send("Hello, server running")
+})
+
+
+
 //request for post to send email
-app.post('/send', (req, res)=> {
+app.post('/apis/send', (req, res)=> {
     
-    const val = req.body
+    
+    const val = req.body.cust
+    saveToDB(val);
     console.log(val)
     //send to clinet
     mailOptions.to = val.email;
@@ -98,7 +171,7 @@ app.post('/send', (req, res)=> {
     sendmail();
 
     //
-    res.send("done")
+    res.send("done sending emailing")
 
 
     
