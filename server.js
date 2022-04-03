@@ -5,7 +5,8 @@ const port=  process.env.PORT || 3000;
 
 var path = require('path');   
 
-
+//creating gallery images static folder middleware with express
+// images
 app.use('/images',express.static('images/galleryimages'));
 
   
@@ -34,11 +35,10 @@ mongoose.connection.on('connected', () => {
 //make a schema
 const Schema = mongoose.Schema;
 const MyData = new Schema({
-    firstName : String,
-    lastName :String,
+    fullName : String,
     email : String,
-    phone: Number,
-    details: String
+    style: String,
+    orderDetails: String
     //price: int --for later
 });
 
@@ -46,14 +46,6 @@ const MyData = new Schema({
 //our collection db online is customerinfos -- but mongo will auto pluralize the customerInfo in the code
 const makeCustomerModel = mongoose.model('customerInfo', MyData) //collection in our db called 'customerInfo'
 
-//add data and save //just a test sample but should put this in the request
-const data = {
-    "firstName": "Moh2121",
-    "lastName": "mo",
-    "email": "mohdbd99@gmail.com",
-    "phone": 2222,
-    "details": "okkk"
-}
 
 function saveToDB(custData){
      //now we save to mongoDB
@@ -66,14 +58,6 @@ function saveToDB(custData){
     }
  })
 }
-//const newData = new makeCustomerModel(data)
-//newData.save((error)=> {
-  //  if (error){
-  //      console.log("issue")
-  //  }else{
- //       console.log("added to dattabse")
- //   }
-//})
 
 //---------------------------------------------------------------------
 //my requests
@@ -83,30 +67,21 @@ const parser = require('body-parser');
 app.use(parser.json());
 app.use(parser.urlencoded({extended: true}))
 
-//creating gallery images static folder middleware with express
-
-//-----------------------------    images
-
-
-
-
-
-
 
 
 //transporter - makes the connction for us
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'johnbasic23@gmail.com',
-        pass: 'uasrjgheikdgrdsl'
+        user: 'woodstove.goods@gmail.com',
+        pass: 'fmqxeljqbulkeaxy'
 
     }
 });
 //what we want to send and from who
 //modify for both business and client
 let mailOptions = {
-    from: 'johnbasic23@gmail.com',
+    from: 'woodstove.goods@gmail.com',
     to: '',
     subject: '',
     text: '',
@@ -152,22 +127,25 @@ app.post('/apis/send', (req, res)=> {
     
     
     const val = req.body.cust
-    saveToDB(val);
+    saveToDB(val);//save to database
     console.log(val)
-    //send to clinet
+
+
+    //send to clinet----
     mailOptions.to = val.email;
-    
     mailOptions.subject = 'Order received'
-    mailOptions.text = ('Hi,' + (val.firstName)+ '\n , We have recived your order' 
-    +'We will look it it and please await confirmation once its processed, thank you')
+    mailOptions.text = ('Hi,' + (val.fullName)+ '\n  We have received your order.\n\n' 
+    +'We will look into it and will shortly send you an email to converse with you to create your item. \n'
+    +'Once we come to an agreement, the order will be approved and you will receive separate email with payment code.\n\n' +
+    'Thank you for doing business with us \n\n Woodstove Leather Goods')
     sendmail();
     
-    //send to business
+    //send to business----
     mailOptions.replyTo = val.email //reply to client
     mailOptions.to = mailOptions.from; //to business
     mailOptions.subject = 'Incoming custom order'
      mailOptions.text = ('Incoming order received \n'+ 
-    'Order details: \n'+ val.firstName + val.details )
+    'Order details: \n'+ 'Name: '+val.fullName + '\n'+ 'Email: ' + val.email + '\n' + 'Style: '+ val.style + '\n'+ 'Custom information: '+ val.orderDetails )
     sendmail();
 
     //
