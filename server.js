@@ -76,6 +76,9 @@ let transporter = nodemailer.createTransport({
         user: 'woodstove.goods@gmail.com',
         pass: 'fmqxeljqbulkeaxy'
 
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 //what we want to send and from who
