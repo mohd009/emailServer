@@ -74,6 +74,8 @@ function saveToDB(custData){
 }
 
 //this function will need to be rewritten , only used it to get JSON file into db , but now dont need the file and only need db , and to call it
+//this function will also need to be used again when we get the full batch info from client will all images , meaning we have to categorise all the data
+//will be an absolute megaton of writing , which is why we do this over the summer
 function saveGalleryInfotoDB()
 {
     if(true)
