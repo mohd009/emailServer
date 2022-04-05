@@ -1,7 +1,9 @@
 const nodemailer = require('nodemailer')
 const express = require('express');
 const app = express();
+const fs = require('fs')
 const port=  process.env.PORT || 3000;
+
 
 var path = require('path');   
 
@@ -42,9 +44,21 @@ const MyData = new Schema({
     //price: int --for later
 });
 
+//galleryinfo Schema
+const GallInfo = new Schema({
+    imgid: Number,
+    imgurl: String,
+    imgtitle: String,
+    imginfo: String
+    //eventually will add category
+})
+
 // define how we want model to be 
 //our collection db online is customerinfos -- but mongo will auto pluralize the customerInfo in the code
 const makeCustomerModel = mongoose.model('customerInfo', MyData) //collection in our db called 'customerInfo'
+
+//define gallery model , comments above apply
+const makeGalleryModel = mongoose.model('galleryinfo',GallInfo);
 
 
 function saveToDB(custData){
@@ -59,11 +73,38 @@ function saveToDB(custData){
  })
 }
 
+//this function will need to be rewritten , only used it to get JSON file into db , but now dont need the file and only need db , and to call it
+function saveGalleryInfotoDB()
+{
+    if(true)
+    {
+        let rawdata = fs.readFileSync('jsonfiles/JSONgalleryinfo.json')
+        let jsonfile = JSON.parse(rawdata);
+        //console.log(jsonfile);
+        makeGalleryModel.insertMany(jsonfile, (err) => {
+            if(err)
+            {
+                console.log("Something went wrong, here you go: " + err)
+            }
+            else
+            {
+                console.log("Bulk insert worked")
+                JSONFLAG = false;
+            }
+        })
+    }
+    else
+    {
+        console.log("Documents already in there")
+    }
+}
+
 //---------------------------------------------------------------------
 //my requests
 //----------------------------------------------------------------------
 //for post
 const parser = require('body-parser');
+const { raw } = require('express');
 app.use(parser.json());
 app.use(parser.urlencoded({extended: true}))
 
@@ -162,5 +203,6 @@ app.post('/apis/send', (req, res)=> {
 app.listen(port, () => {
     
     console.log(`Woodstove Leather Goods server running on port:${port} `);
+    
     
       });
